@@ -6,3 +6,5 @@ COPY ai-youtube-automation.json /data/ai-youtube-automation.json
 
 # Start n8n
 CMD ["n8n", "start"]
+EXPOSE 5678
+
