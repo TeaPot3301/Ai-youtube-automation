@@ -1,0 +1,147 @@
+
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Generate Script",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [200, 300],
+      "parametersOptions": {
+        "url": "https://api-inference.huggingface.co/models/bigscience/bloom-560m",
+        "method": "POST",
+        "json": true,
+        "body": {
+          "inputs": "You have to choose one to protect you: Griffin, Minotaur, Cerberus, Phoenix, Hydra. Which one would you pick?"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [400, 300],
+      "parametersOptions": {
+        "url": "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2",
+        "method": "POST",
+        "json": true,
+        "body": {
+          "inputs": "Mythical creature [name], dark, mysterious, highly detailed, cinematic lighting, 16:9"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Image to Video",
+      "type": "n8n-nodes-base.ffmpeg",
+      "typeVersion": 1,
+      "position": [500, 300],
+      "parametersOptions": {
+        "command": "-framerate 1 -i image.jpg -c:v libx264 -r 30 -pix_fmt yuv420p video.mp4"
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Background Music",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [600, 300],
+      "parametersOptions": {
+        "url": "https://files.catbox.moe/t54s7q.mp3"
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Merge Video",
+      "type": "n8n-nodes-base.ffmpeg",
+      "typeVersion": 1,
+      "position": [800, 300],
+      "parametersOptions": {
+        "command": "-i video.mp4 -i music.mp3 -shortest -c:v copy -c:a aac final_video.mp4"
+      }
+    },
+    {
+      "parameters": {},
+      "name": "Upload to YouTube",
+      "type": "n8n-nodes-base.youtube",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {},
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    }
+  ],
+  "connections": {
+    "Generate Script": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Image to Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to Video": {
+      "main": [
+        [
+          {
+            "node": "Background Music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Background Music": {
+      "main": [
+        [
+          {
+            "node": "Merge Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Video": {
+      "main": [
+        [
+          {
+            "node": "Upload to YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Telegram Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
