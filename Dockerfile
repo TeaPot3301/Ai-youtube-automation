@@ -1,10 +1,23 @@
-# Pull the official n8n Docker image
-FROM n8nio/n8n
+# Base Image
+FROM node:18
 
-# Copy JSON file into the container
-COPY ai-youtube-automation.json /data/ai-youtube-automation.json
+# Set working directory
+WORKDIR /app
 
-# Start n8n
-CMD ["n8n", "start"]
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Install n8n globally (the missing nigga 💀)
+RUN npm install -g n8n
+
+# Copy the entire project
+COPY . .
+
+# Expose Port 5678 (n8n default port)
 EXPOSE 5678
 
+# Run n8n server
+CMD ["n8n", "start"]
